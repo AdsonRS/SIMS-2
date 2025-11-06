@@ -1,0 +1,8 @@
+{
+  "name": "Copy of Copy of SIMS UFMA",
+  "description": "An integrated sustainable mobility app for UFMA, offering real-time bike station tracking, QR code unlocking, trip history, and an AI-powered campus assistant.",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ]
+}
