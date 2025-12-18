@@ -1,8 +1,13 @@
 {
-  "name": "Copy of Copy of SIMS UFMA",
-  "description": "An integrated sustainable mobility app for UFMA, offering real-time bike station tracking, QR code unlocking, trip history, and an AI-powered campus assistant.",
+  "name": "SIMS UFMA",
+  "short_name": "SIMS",
+  "description": "Sistema Integrado de Mobilidade Sustentável da UFMA. Rastreamento de estações, desbloqueio por QR Code e ranking semanal.",
   "requestFramePermissions": [
     "camera",
     "geolocation"
-  ]
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#9333ea"
 }

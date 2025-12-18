@@ -11,87 +11,114 @@ import QrScanner from './components/QrScanner.tsx';
 import TripInProgressScreen from './components/TripInProgressScreen.tsx';
 import { stationDataMap } from './data/stations.ts';
 import ProfileScreen from './components/ProfileScreen.tsx';
-
-const QrCodeIcon = ({ className }) => (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-      <path d="M4 4h6v6H4V4zm2 2v2h2V6H6zM4 14h6v6H4v-6zm2 2v2h2v-2H6zm10-12h6v6h-6V4zm2 2v2h2V6h-2zM14 14h2v2h-2v-2zm2 2h2v2h-2v-2zm-2 2h2v2h-2v-2zm-2-2h2v2h-2v-2zm-2 2h2v2h-2v-2zm2-4h2v2h-2v-2zm2-2h2v2h-2v-2zm2 2h2v2h-2v-2z"/>
-    </svg>
-);
+import RankingScreen from './components/RankingScreen.tsx';
 
 const App = () => {
-  const [activeScreen, setActiveScreen] = useState(Screen.Map);
-  const [currentView, setCurrentView] = useState('main');
-  const [scannedStationId, setScannedStationId] = useState(null);
-  const [isProfileVisible, setIsProfileVisible] = useState(false);
+  // Navigation State
+  const [activeOverlay, setActiveOverlay] = useState<string | null>(null); // 'wallet', 'trips', 'settings', 'ranking', 'profile'
+  const [tripState, setTripState] = useState<'idle' | 'scanning' | 'active'>('idle');
+  const [scannedStationId, setScannedStationId] = useState<string | null>(null);
 
-  const handleScanClick = () => {
-    setCurrentView('scanning');
-  };
-
+  // Handlers
+  const handleScanClick = () => setTripState('scanning');
+  
   const handleScanSuccess = (stationId) => {
     setScannedStationId(stationId);
-    setCurrentView('trip');
+    setTripState('active');
   };
 
-  const handleScanCancel = () => {
-    setCurrentView('main');
-  };
-
+  const handleScanCancel = () => setTripState('idle');
+  
   const handleEndTrip = () => {
     setScannedStationId(null);
-    setCurrentView('main');
+    setTripState('idle');
   };
 
-  const handleProfileClick = () => {
-    setIsProfileVisible(true);
-  };
-
-  const handleProfileClose = () => {
-    setIsProfileVisible(false);
-  };
-  
-  const renderMainScreen = () => {
-    switch (activeScreen) {
-      case Screen.Map:
-        return <MapScreen />;
-      case Screen.Trips:
-        return <TripsScreen />;
-      case Screen.Wallet:
-        return <WalletScreen />;
-      case Screen.Settings:
-        return <SettingsScreen />;
-      default:
-        return <MapScreen />;
+  const toggleOverlay = (screen) => {
+    if (activeOverlay === screen) {
+      setActiveOverlay(null); // Close if clicking same
+    } else {
+      setActiveOverlay(screen);
     }
   };
 
   const stationName = scannedStationId ? stationDataMap[scannedStationId] || "Estação Desconhecida" : "";
 
+  // Main Render Logic
   return (
-    <div className="relative h-screen w-screen bg-gray-50 flex flex-col font-sans max-w-md mx-auto shadow-2xl overflow-hidden">
-      {currentView === 'scanning' ? (
-        <QrScanner onScanSuccess={handleScanSuccess} onCancel={handleScanCancel} />
-      ) : currentView === 'trip' ? (
-        <TripInProgressScreen stationName={stationName} onEndTrip={handleEndTrip} />
-      ) : (
-        <>
-          <Header onProfileClick={handleProfileClick} />
-          <main className="flex-1 overflow-y-auto pb-16">
-            {renderMainScreen()}
-          </main>
+    <div className="relative h-full w-full bg-gray-50 overflow-hidden flex flex-col">
+      
+      {/* 1. BACKGROUND LAYER: MAP (Always Visible) */}
+      <div className="absolute inset-0 z-0">
+        <MapScreen onStationClick={() => {}} />
+      </div>
 
-          <button
-            onClick={handleScanClick}
-            aria-label="Escanear QR Code"
-            className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 bg-purple-600 text-white rounded-full p-4 shadow-2xl flex items-center justify-center transform transition-transform hover:scale-110 active:scale-100 focus:outline-none focus:ring-4 focus:ring-purple-400 focus:ring-opacity-50"
-          >
-            <QrCodeIcon className="w-8 h-8"/>
-          </button>
-          
-          <BottomNav activeScreen={activeScreen} setActiveScreen={setActiveScreen} />
-        </>
+      {/* 2. HEADER LAYER (Floating) */}
+      <div className={`absolute top-0 left-0 right-0 z-20 transition-transform duration-300 ${tripState !== 'idle' ? '-translate-y-full' : 'translate-y-0'}`}>
+        <Header 
+          onProfileClick={() => setActiveOverlay('profile')} 
+          onRankingClick={() => setActiveOverlay('ranking')}
+        />
+      </div>
+
+      {/* 3. CONTENT OVERLAYS (Slide Up) */}
+      {/* Dimmer Background */}
+      {activeOverlay && (
+        <div 
+          className="absolute inset-0 bg-black/20 backdrop-blur-sm z-30 transition-opacity" 
+          onClick={() => setActiveOverlay(null)}
+        />
       )}
-      {isProfileVisible && <ProfileScreen onClose={handleProfileClose} />}
+
+      {/* Sheet Container - Adjusted bottom padding for fixed nav */}
+      <div 
+        className={`absolute inset-x-0 bottom-0 z-40 bg-white rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.1)] transition-transform duration-300 ease-out flex flex-col max-h-[85vh] ${
+          activeOverlay ? 'translate-y-0' : 'translate-y-full'
+        }`}
+      >
+        {/* Drag Handle */}
+        <div className="w-full flex justify-center pt-3 pb-1" onClick={() => setActiveOverlay(null)}>
+          <div className="w-12 h-1.5 bg-gray-300 rounded-full cursor-pointer"></div>
+        </div>
+
+        {/* Scrollable Content Area */}
+        <div className="flex-1 overflow-y-auto p-4 pb-24 no-scrollbar">
+          {activeOverlay === Screen.Wallet && <WalletScreen />}
+          {activeOverlay === Screen.Trips && <TripsScreen />}
+          {activeOverlay === Screen.Settings && <SettingsScreen />}
+          {activeOverlay === 'profile' && <ProfileScreen onClose={() => setActiveOverlay(null)} />}
+          {activeOverlay === 'ranking' && <RankingScreen />}
+        </div>
+      </div>
+
+      {/* 4. FULL SCREEN MODES (Scanning / Trip) */}
+      {tripState === 'scanning' && (
+        <div className="absolute inset-0 z-50">
+          <QrScanner onScanSuccess={handleScanSuccess} onCancel={handleScanCancel} />
+        </div>
+      )}
+
+      {tripState === 'active' && (
+        <div className="absolute inset-0 z-50 bg-white">
+          <TripInProgressScreen stationName={stationName} onEndTrip={handleEndTrip} />
+        </div>
+      )}
+
+      {/* 5. FIXED BOTTOM NAVIGATION (Classic Style) */}
+      <div className={`absolute bottom-0 left-0 right-0 z-50 transition-transform duration-300 ${tripState !== 'idle' ? 'translate-y-full' : 'translate-y-0'}`}>
+        <BottomNav 
+          activeScreen={activeOverlay || Screen.Map} 
+          onNavigate={(screen) => {
+             if (screen === Screen.Map) {
+               setActiveOverlay(null);
+             } else {
+               toggleOverlay(screen);
+             }
+          }}
+          onScan={handleScanClick}
+        />
+      </div>
+
     </div>
   );
 };

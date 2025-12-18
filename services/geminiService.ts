@@ -1,13 +1,8 @@
 
 import { GoogleGenAI } from "@google/genai";
 
-const API_KEY = process.env.API_KEY;
-
-if (!API_KEY) {
-  throw new Error("API_KEY environment variable not set");
-}
-
-const ai = new GoogleGenAI({ apiKey: API_KEY });
+// FIX: Initializing GoogleGenAI using process.env.API_KEY directly as required by guidelines.
+const getAI = () => new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const fileToGenerativePart = async (file) => {
   const base64EncodedDataPromise = new Promise((resolve) => {
@@ -17,23 +12,26 @@ const fileToGenerativePart = async (file) => {
     reader.readAsDataURL(file);
   });
   return {
-    inlineData: { data: await base64EncodedDataPromise, mimeType: file.type },
+    inlineData: { data: await base64EncodedDataPromise as string, mimeType: file.type },
   };
 };
 
 export const analyzeBikeDamage = async (image, description) => {
   try {
+    const ai = getAI();
     const imagePart = await fileToGenerativePart(image);
     const textPart = {
       text: `Analyze the user's photo and description of a bike issue. Based on the visual evidence and the text "${description}", categorize the problem (e.g., "Pneu furado", "Freio com defeito", "Corrente solta", "Outro"). Provide a short, direct answer.`,
     };
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      // FIX: Using gemini-3-flash-preview for basic classification/reasoning tasks.
+      model: 'gemini-3-flash-preview',
       contents: { parts: [imagePart, textPart] },
     });
 
-    return response.text.trim();
+    // FIX: Accessing .text property directly (it's a getter, not a method).
+    return response.text?.trim() || "Análise concluída.";
   } catch (error) {
     console.error("Error analyzing bike damage:", error);
     return "Não foi possível analisar a imagem. Tente novamente.";
@@ -42,8 +40,10 @@ export const analyzeBikeDamage = async (image, description) => {
 
 export const getCampusInfo = async (query) => {
   try {
+    const ai = getAI();
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      // FIX: Using gemini-3-flash-preview for general Q&A with search grounding.
+      model: "gemini-3-flash-preview",
       contents: `O usuário está perguntando sobre a universidade UFMA. Responda à pergunta: "${query}"`,
       config: {
         tools: [{ googleSearch: {} }],
@@ -60,7 +60,8 @@ export const getCampusInfo = async (query) => {
 
 export const findPointsOfInterest = async (query, location) => {
   try {
-    // FIX: Type config as any to allow adding toolConfig property.
+    const ai = getAI();
+    // FIX: Typing config as any to satisfy toolConfig extension.
     const config: any = {
       tools: [{ googleMaps: {} }],
     };
@@ -76,6 +77,7 @@ export const findPointsOfInterest = async (query, location) => {
     }
 
     const response = await ai.models.generateContent({
+      // FIX: Maps grounding is specifically supported in 2.5 series models.
       model: "gemini-2.5-flash",
       contents: `O usuário está no campus da UFMA e quer encontrar algo. Responda à pergunta: "${query}"`,
       config,
