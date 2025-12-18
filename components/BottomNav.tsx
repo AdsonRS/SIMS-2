@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Screen } from '../types.ts';
+import { Screen } from '../types';
 
 const MapIcon = ({ active }) => (
   <svg className={`w-6 h-6 mb-1 ${active ? 'fill-purple-600' : 'fill-gray-400'}`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">

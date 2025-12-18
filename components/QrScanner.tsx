@@ -1,9 +1,9 @@
 
 import React, { useEffect, useRef } from 'react';
-import { isValidStation } from '../data/stations.ts';
+import { isValidStation } from '../data/stations';
 
 const QrScanner = ({ onScanSuccess, onCancel }) => {
-  const scannerRef = useRef(null);
+  const scannerRef = useRef<any>(null);
 
   useEffect(() => {
     // FIX: Cast window to 'any' to access Html5Qrcode, which is loaded from a script tag.

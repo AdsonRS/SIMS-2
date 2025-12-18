@@ -1,17 +1,17 @@
 
 import React, { useState } from 'react';
-import { Screen } from './types.ts';
-import Header from './components/Header.tsx';
-import BottomNav from './components/BottomNav.tsx';
-import MapScreen from './components/MapScreen.tsx';
-import TripsScreen from './components/TripsScreen.tsx';
-import WalletScreen from './components/WalletScreen.tsx';
-import SettingsScreen from './components/SettingsScreen.tsx';
-import QrScanner from './components/QrScanner.tsx';
-import TripInProgressScreen from './components/TripInProgressScreen.tsx';
-import { stationDataMap } from './data/stations.ts';
-import ProfileScreen from './components/ProfileScreen.tsx';
-import RankingScreen from './components/RankingScreen.tsx';
+import { Screen } from './types';
+import Header from './components/Header';
+import BottomNav from './components/BottomNav';
+import MapScreen from './components/MapScreen';
+import TripsScreen from './components/TripsScreen';
+import WalletScreen from './components/WalletScreen';
+import SettingsScreen from './components/SettingsScreen';
+import QrScanner from './components/QrScanner';
+import TripInProgressScreen from './components/TripInProgressScreen';
+import { stationDataMap } from './data/stations';
+import ProfileScreen from './components/ProfileScreen';
+import RankingScreen from './components/RankingScreen';
 
 const App = () => {
   // Navigation State
@@ -42,7 +42,10 @@ const App = () => {
     }
   };
 
-  const stationName = scannedStationId ? stationDataMap[scannedStationId] || "Estação Desconhecida" : "";
+  // Safe indexing with fallback
+  const stationName = scannedStationId && (stationDataMap as any)[scannedStationId] 
+    ? (stationDataMap as any)[scannedStationId] 
+    : "Estação Desconhecida";
 
   // Main Render Logic
   return (

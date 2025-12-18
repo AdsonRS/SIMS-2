@@ -1,6 +1,6 @@
 
 import React from 'react';
-import ReportProblemFlow from './ReportProblemFlow.tsx';
+import ReportProblemFlow from './ReportProblemFlow';
 
 const UserProfileCard = () => (
   <div className="bg-white p-6 rounded-lg shadow-md mb-6">
