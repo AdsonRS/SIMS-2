@@ -2,11 +2,11 @@
 import React from 'react';
 
 const rankingData = [
-  { id: 1, name: "Ana Silva", distance: "42.5 km", avatar: "https://api.dicebear.com/9.x/avataaars/svg?seed=Ana", medal: "🥇" },
-  { id: 2, name: "Carlos Edu", distance: "38.2 km", avatar: "https://api.dicebear.com/9.x/avataaars/svg?seed=Carlos", medal: "🥈" },
-  { id: 3, name: "Beatriz M.", distance: "35.0 km", avatar: "https://api.dicebear.com/9.x/avataaars/svg?seed=Bea", medal: "🥉" },
-  { id: 4, name: "João Pedro", distance: "29.8 km", avatar: "https://api.dicebear.com/9.x/avataaars/svg?seed=Joao", medal: null },
-  { id: 5, name: "Mariana L.", distance: "22.1 km", avatar: "https://api.dicebear.com/9.x/avataaars/svg?seed=Mari", medal: null },
+  { id: 1, name: "Adson   P.", distance: "42.5 km", avatar: "https://api.dicebear.com/9.x/avataaars/svg?seed=Ana", medal: "🥇" },
+  { id: 2, name: "Alicia  E.", distance: "38.2 km", avatar: "https://api.dicebear.com/9.x/avataaars/svg?seed=Carlos", medal: "🥈" },
+  { id: 3, name: "Arlison R.", distance: "35.0 km", avatar: "https://api.dicebear.com/9.x/avataaars/svg?seed=Bea", medal: "🥉" },
+  { id: 4, name: "Emanoel D.", distance: "29.8 km", avatar: "https://api.dicebear.com/9.x/avataaars/svg?seed=Joao", medal: null },
+  { id: 5, name: "Lucas   I.", distance: "22.1 km", avatar: "https://api.dicebear.com/9.x/avataaars/svg?seed=Mari", medal: null },
 ];
 
 // FIX: Added React.FC type to RankingItem to resolve the 'key' prop error in lists by inheriting from standard React component props.
